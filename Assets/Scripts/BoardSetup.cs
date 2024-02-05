@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using UnityEngine.Tilemaps;
 namespace CharlieMadeAThing.ProjectHex {
     public class BoardSetup : MonoBehaviour {
 
-        [SerializeField] Tilemap boardTilemap;
+        public Tilemap boardTilemap;
         [SerializeField] Tile validBoardTile;
         Dictionary<Vector3Int, Node> _nodes;
         [SerializeField] OrbTypeData orbPrefabLookup;
@@ -195,18 +196,6 @@ namespace CharlieMadeAThing.ProjectHex {
             foreach ( var node in _nodes ) {
                 node.Value.DoTick();
             }
-
-            if ( Input.GetMouseButtonDown( 0 ) ) {
-                var mousePos = Camera.main.ScreenToWorldPoint( Input.mousePosition );
-                var cellPos = boardTilemap.WorldToCell( mousePos );
-                var worldPosFromCell = boardTilemap.CellToWorld( cellPos );
-                var localPlace = new Vector3Int( (int)cellPos.x, (int)cellPos.y, 0 );
-                var n = _nodes[localPlace];
-                if ( n == null ) return;
-                foreach ( var neighbor in n.Neighbors ) {
-                    Debug.Log($"{n.Position}:{n.CurrentOrb} => {neighbor.CurrentOrb}:{neighbor.Position}");
-                }
-            }
         }
 
         void SetupBoard() {
@@ -238,14 +227,18 @@ namespace CharlieMadeAThing.ProjectHex {
             _nodes[pos].CurrentOrbSpriteRenderer = newOrb.GetComponentInChildren<SpriteRenderer>();
         }
 
-        void RemoveOrb( Vector3Int pos ) {
+        public void RemoveOrb( Vector3Int pos ) {
             if ( !IsValidPosition( pos ) ) {
                 Debug.LogWarning( $"Position {pos} is not valid!" );
                 return;
             }
             _currentCounts[_nodes[pos].CurrentOrb]--;
             _nodes[pos].CurrentOrb = OrbType.None;
-            Destroy(_nodes[pos].CurrentOrbGameObject);
+            //Destroy(_nodes[pos].CurrentOrbGameObject);
+        }
+
+        public Node GetNode( Vector3Int position ) {
+            return _nodes.GetValueOrDefault( position );
         }
 
         bool IsValidPosition( Vector3Int pos ) {
@@ -289,23 +282,24 @@ namespace CharlieMadeAThing.ProjectHex {
     }
     
 
+    [Flags]
     public enum OrbType {
-        NonPlayable,
-        None,
-        Fire,
-        Water,
-        Earth,
-        Air,
-        Nuke,
-        Zero,
-        One,
-        Save,
-        NetworkOne,
-        NetworkTwo,
-        NetworkThree,
-        NetworkFour,
-        NetworkFive,
-        Encrypt
+        NonPlayable = 0,
+        None = 1,
+        Fire = 2,
+        Water = 4,
+        Earth = 8,
+        Air = 16,
+        Nuke = 32,
+        Zero = 64,
+        One = 128,
+        Save = 256,
+        NetworkOne = 1024,
+        NetworkTwo = 2048,
+        NetworkThree = 4096,
+        NetworkFour = 8192,
+        NetworkFive = 16384,
+        Encrypt = 32768
     }
 }
 

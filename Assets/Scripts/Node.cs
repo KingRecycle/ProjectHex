@@ -6,14 +6,15 @@ using UnityEngine.Tilemaps;
 namespace CharlieMadeAThing.ProjectHex {
     public class Node {
         public OrbType CurrentOrb;
+        public OrbType MatchingOrb;
+        public Orb orb;
         public bool IsClickable;
         public Vector3Int Position;
         public GameObject CurrentOrbGameObject;
         public SpriteRenderer CurrentOrbSpriteRenderer;
 
         public List<Node> Neighbors = new();
-
-        //public Node[] OrderedNeighbors = new Node[6];
+        
         public Tile Tile;
 
 
@@ -23,9 +24,21 @@ namespace CharlieMadeAThing.ProjectHex {
 
         public void DoTick() {
             if ( CurrentOrb is OrbType.None or OrbType.NonPlayable ) {
+                if ( CurrentOrbSpriteRenderer ) {
+                    CurrentOrbSpriteRenderer.color = new Color( 0f, 0f, 0f, 0f );
+                }
+
                 return;
             }
 
+            if ( orb == null ) {
+                orb = CurrentOrbGameObject.GetComponent<Orb>();
+            }
+            else {
+                MatchingOrb = orb.OrbData.MatchingTypes;
+            }
+
+            
             IsClickable = DoesHaveThreeConsecutiveEmptyNeighbors();
             if ( CurrentOrbSpriteRenderer ) {
                 CurrentOrbSpriteRenderer.color =
