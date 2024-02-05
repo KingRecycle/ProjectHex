@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b56129a4d7644c21aa1539a019bb4d06, type: 3}
+  m_Name: OrbPrefabLookup
+  m_EditorClassIdentifier: 
+  orbTypeToPrefab:
+    _serializedList:
+    - Key: 2
+      Value: {fileID: 7171568904227177989, guid: 79275873bb9b65741bf819e11795ed34, type: 3}
+    - Key: 3
+      Value: {fileID: 7171568904227177989, guid: 4f84dd7db6fcb3944aba8b19cc99261f, type: 3}
+    - Key: 4
+      Value: {fileID: 7171568904227177989, guid: 590f2c55bc2ab5c4fad227bf11905e43, type: 3}
+    - Key: 5
+      Value: {fileID: 7171568904227177989, guid: dacd59c636ea44840aa2384a21c7957c, type: 3}
+    - Key: 6
+      Value: {fileID: 7171568904227177989, guid: f60ca585e7f733248ad9c6ffe5f57e63, type: 3}
+    - Key: 7
+      Value: {fileID: 7171568904227177989, guid: 04292e84b0613be4f82a9bcf9a02d827, type: 3}
+    - Key: 8
+      Value: {fileID: 7171568904227177989, guid: 03a9a93512a27c642b80540dd875f7a0, type: 3}
+    - Key: 9
+      Value: {fileID: 7171568904227177989, guid: f57b5457b10fad54c867d5c0692ef5e8, type: 3}
+    - Key: 10
+      Value: {fileID: 7171568904227177989, guid: aeeaaa964f401a64daa9e480e35257f1, type: 3}
+    - Key: 11
+      Value: {fileID: 7171568904227177989, guid: beebac808a836ea43b08d45f490473ca, type: 3}
+    - Key: 12
+      Value: {fileID: 7171568904227177989, guid: 017bafd94b8a56943a066b63e74e3ff6, type: 3}
+    - Key: 13
+      Value: {fileID: 7171568904227177989, guid: 1b48ca8e5f8d57c4794551723f492bc5, type: 3}
+    - Key: 14
+      Value: {fileID: 7171568904227177989, guid: 3c7fd61fcb44c8341881466f6e3b184a, type: 3}
+    - Key: 15
+      Value: {fileID: 7171568904227177989, guid: abc0bb3941245e94fa3c4adccb88a730, type: 3}
