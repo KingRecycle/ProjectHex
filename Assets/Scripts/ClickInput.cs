@@ -17,8 +17,8 @@ namespace CharlieMadeAThing.ProjectHex {
                 if ( !tempNode.IsClickable ) return;
                 
                 if ( firstClickedNode == null ) {
-                    Debug.Log($"Orb Selected: {firstClickedNode.CurrentOrb}");
                     firstClickedNode = tempNode;
+                    Debug.Log($"Orb Selected: {firstClickedNode.CurrentOrb}");
                     if ( firstClickedNode.CurrentOrb == OrbType.Encrypt ) {
                         board.RemoveOrb( firstClickedNode.Position );
                         firstClickedNode = null;
