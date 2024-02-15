@@ -131,4 +131,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cbd6b678e291cb4bbdb37511e2b6f68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OrbData: {fileID: 11400000, guid: 5cdea915ebb195f4b8c211c1b369adce, type: 2}
+  orbData: {fileID: 11400000, guid: 5cdea915ebb195f4b8c211c1b369adce, type: 2}

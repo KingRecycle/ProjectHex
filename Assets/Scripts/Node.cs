@@ -16,6 +16,7 @@ namespace CharlieMadeAThing.ProjectHex {
         public List<Node> Neighbors = new();
         
         public Tile Tile;
+        public BoardSetup board;
 
 
         public void ChangeOrbType( OrbType type ) {
@@ -35,11 +36,11 @@ namespace CharlieMadeAThing.ProjectHex {
                 orb = CurrentOrbGameObject.GetComponent<Orb>();
             }
             else {
-                MatchingOrb = orb.OrbData.MatchingTypes;
+                MatchingOrb = orb.orbData.MatchingTypes;
             }
 
             
-            IsClickable = DoesHaveThreeConsecutiveEmptyNeighbors();
+            IsClickable = DoesHaveThreeConsecutiveEmptyNeighbors() && IsPrerequisiteAchieved();
             if ( CurrentOrbSpriteRenderer ) {
                 CurrentOrbSpriteRenderer.color =
                     IsClickable ? new Color( 1f, 1f, 1f, 1f ) : new Color( 1f, 1f, 1f, 0.3f );
@@ -67,5 +68,24 @@ namespace CharlieMadeAThing.ProjectHex {
 
             return false;
         }
+
+        //Checks for prerequisites. Some orbs can't be clicked unless they are met even if 3 empty neighbors.
+        bool IsPrerequisiteAchieved() {
+            switch ( CurrentOrb ) {
+                case OrbType.NetworkTwo when board.IsOrbOnBoard( OrbType.NetworkOne ):
+                    return false;
+                case OrbType.NetworkThree when board.IsOrbOnBoard( OrbType.NetworkTwo ):
+                    return false;
+                case OrbType.NetworkFour when board.IsOrbOnBoard( OrbType.NetworkThree ):
+                    return false;
+                case OrbType.NetworkFive when board.IsOrbOnBoard( OrbType.NetworkFour ):
+                    return false;
+                case OrbType.Encrypt when !board.IsEncryptTheLastOrbLeft():
+                    return false;
+                default:
+                    return true;
+            }
+        }
+        
     }
 }

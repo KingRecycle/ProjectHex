@@ -225,6 +225,7 @@ namespace CharlieMadeAThing.ProjectHex {
             _currentCounts[type]++;
             _nodes[pos].CurrentOrbGameObject = newOrb;
             _nodes[pos].CurrentOrbSpriteRenderer = newOrb.GetComponentInChildren<SpriteRenderer>();
+            _nodes[pos].board = this;
         }
 
         public void RemoveOrb( Vector3Int pos ) {
@@ -239,6 +240,19 @@ namespace CharlieMadeAThing.ProjectHex {
 
         public Node GetNode( Vector3Int position ) {
             return _nodes.GetValueOrDefault( position );
+        }
+
+        public bool IsOrbOnBoard( OrbType orbType ) {
+            return _currentCounts[orbType] >= 1;
+        }
+
+        public bool IsEncryptTheLastOrbLeft() {
+            //Check if all the orb counts are 0 but OrbType.Encrypt
+            if ( _currentCounts.Sum( x => x.Value ) == 1 ) {
+                return _currentCounts[OrbType.Encrypt] == 1;
+            }
+
+            return false;
         }
 
         bool IsValidPosition( Vector3Int pos ) {

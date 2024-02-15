@@ -5,6 +5,7 @@ using UnityEngine;
 namespace CharlieMadeAThing.ProjectHex
 {
     public class Orb : MonoBehaviour {
-        public OrbData OrbData;
+        public OrbData orbData;
+        
     }
 }
