@@ -54,11 +54,9 @@ namespace CharlieMadeAThing.ProjectHex {
                 if ( currentNeighbor.CurrentOrb is not (OrbType.None or OrbType.NonPlayable) ) {
                     continue;
                 }
-                //Debug.Log($"{i % Neighbors.Count + 1} == {i % Neighbors.Count + 2}");
+
                 var nextNeighbor = Neighbors[(i + 1) % Neighbors.Count];
                 var nextNextNeighbor = Neighbors[(i + 2) % Neighbors.Count];
-                
-//                Debug.Log($"{currentNeighbor.CurrentOrb} == {nextNeighbor.CurrentOrb} == {nextNextNeighbor.CurrentOrb}");
                 
                 if ( (nextNeighbor.CurrentOrb is (OrbType.None or OrbType.NonPlayable)) &&
                      (nextNextNeighbor.CurrentOrb is (OrbType.None or OrbType.NonPlayable ) ) ) {
@@ -69,7 +67,7 @@ namespace CharlieMadeAThing.ProjectHex {
             return false;
         }
 
-        //Checks for prerequisites. Some orbs can't be clicked unless they are met even if 3 empty neighbors.
+        //Checks for prerequisites. Some orbs can't be clicked until a prerequisite is met.
         bool IsPrerequisiteAchieved() {
             switch ( CurrentOrb ) {
                 case OrbType.NetworkTwo when board.IsOrbOnBoard( OrbType.NetworkOne ):

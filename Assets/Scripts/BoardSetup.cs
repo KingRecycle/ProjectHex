@@ -3,70 +3,101 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace CharlieMadeAThing.ProjectHex {
     public class BoardSetup : MonoBehaviour {
-
         public Tilemap boardTilemap;
         [SerializeField] Tile validBoardTile;
-        Dictionary<Vector3Int, Node> _nodes;
         [SerializeField] OrbTypeData orbPrefabLookup;
-        Dictionary<OrbType, int> _currentCounts;
-        Dictionary<OrbType, int> _maxCounts;
-        [SerializeField]List<OrbType> bagOfOrbs;
-    
+
         //UI
         [SerializeField] GameObject trackerPanel;
         [SerializeField] GameObject trackerUIPrefab;
         [SerializeField] TMP_Text orbCountText;
 
         readonly Vector3Int[] _directions = {
-            new Vector3Int( 0, 1, 0 ), // Even Row - Up Right
-            new Vector3Int( 1, 0, 0 ), // Even Row - right
-            new Vector3Int( 0, -1, 0 ), // Even Row - Right Down
-            new Vector3Int( -1, -1, 0 ), // Even Row - Left Down
-            new Vector3Int( -1, 0, 0 ), // Even Row - Left
-            new Vector3Int( -1, 1, 0 ), // Even Row - Left Up
+            new( 0, 1, 0 ), // Even Row - Up Right
+            new( 1, 0, 0 ), // Even Row - right
+            new( 0, -1, 0 ), // Even Row - Right Down
+            new( -1, -1, 0 ), // Even Row - Left Down
+            new( -1, 0, 0 ), // Even Row - Left
+            new( -1, 1, 0 ), // Even Row - Left Up
             //---------\\
-            new Vector3Int( 1, 1, 0 ), // Odd Row - Up Right
-            new Vector3Int( 1, 0, 0 ), // Odd Row - Right
-            new Vector3Int( 1, -1, 0 ), // Odd Row - Right Down
-            new Vector3Int( 0, -1, 0 ), // Odd Row - Left Down
-            new Vector3Int( -1, 0, 0 ), // Odd Row - Left
-            new Vector3Int( 0, 1, 0 ), // Odd Row - Left Up
-            
+            new( 1, 1, 0 ), // Odd Row - Up Right
+            new( 1, 0, 0 ), // Odd Row - Right
+            new( 1, -1, 0 ), // Odd Row - Right Down
+            new( 0, -1, 0 ), // Odd Row - Left Down
+            new( -1, 0, 0 ), // Odd Row - Left
+            new( 0, 1, 0 ) // Odd Row - Left Up
         };
-        
+
+        Dictionary<OrbType, int> _currentCounts;
+        Dictionary<OrbType, int> _maxCounts;
+        readonly Dictionary<Vector3Int, Node> _nodes = new();
+
+        void Start() {
+            InitializeBoard();
+            SetupBoard();
+        }
+
+        void Update() {
+            //Count the total amount of orbs
+            var totalOrbs = _currentCounts.Values.Sum();
+            orbCountText.text = "Orb Count: " + totalOrbs;
+
+            foreach ( var node in _nodes ) {
+                node.Value.DoTick();
+            }
+        }
+
+        //Draw gizmos on orbtype.none
+        void OnDrawGizmos() {
+            if ( _nodes == null ) {
+                return;
+            }
+
+            foreach ( var node in _nodes.Values ) {
+                if ( node.CurrentOrb is OrbType.NonPlayable ) {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawCube( boardTilemap.CellToWorld( node.Position ), Vector3.one * 0.5f );
+                }
+            }
+        }
+
         void InitializeBoard() {
-            _nodes = new Dictionary<Vector3Int, Node>();
-            //Grab all tiles in Tilemap and created a node for each and add them to dictionary
+            //Grab all tiles in Tilemap and creat a node for each and add them to dictionary
             foreach ( var position in boardTilemap.cellBounds.allPositionsWithin ) {
-                if( _nodes.ContainsKey(position)) continue;
+                if ( _nodes.ContainsKey( position ) ) {
+                    continue;
+                }
+
                 var localPlace = new Vector3Int( position.x, position.y, 0 );
-                
+
                 if ( !boardTilemap.HasTile( localPlace ) ) {
                     continue;
                 }
-                // Debug.Log( $"Position: {position} ::: Cell Position: {localPlace}" );
+
                 var node = new Node {
                     Position = localPlace,
                     CurrentOrb = OrbType.None,
                     IsClickable = false,
-                    Tile = boardTilemap.GetTile<Tile>(localPlace)
+                    Tile = boardTilemap.GetTile<Tile>( localPlace )
                 };
 
                 if ( node.Tile != validBoardTile ) {
                     node.CurrentOrb = OrbType.NonPlayable;
                 }
+
                 _nodes.Add( localPlace, node );
             }
 
             foreach ( var kvnode in _nodes ) {
                 var node = kvnode.Value;
-                if ( node.CurrentOrb is OrbType.NonPlayable ) continue;
+                if ( node.CurrentOrb is OrbType.NonPlayable ) {
+                    continue;
+                }
 
                 if ( node.Position.y % 2 == 0 ) {
                     //Check up right
@@ -124,7 +155,7 @@ namespace CharlieMadeAThing.ProjectHex {
                 }
             }
 
-            _currentCounts = new Dictionary<OrbType, int>() {
+            _currentCounts = new Dictionary<OrbType, int> {
                 { OrbType.None, 0 },
                 { OrbType.Fire, 0 },
                 { OrbType.Water, 0 },
@@ -139,10 +170,12 @@ namespace CharlieMadeAThing.ProjectHex {
                 { OrbType.NetworkThree, 0 },
                 { OrbType.NetworkFour, 0 },
                 { OrbType.NetworkFive, 0 },
-                { OrbType.Encrypt, 0 },
+                { OrbType.Encrypt, 0 }
             };
+        }
 
-            bagOfOrbs = new List<OrbType>();
+        List<OrbType> GetShuffledBagOfOrbs() {
+            List<OrbType> bagOfOrbs = new( 55 );
             //Add 8 of each orb type
             for ( var i = 0; i < 8; i++ ) {
                 bagOfOrbs.Add( OrbType.Air );
@@ -150,61 +183,61 @@ namespace CharlieMadeAThing.ProjectHex {
                 bagOfOrbs.Add( OrbType.Fire );
                 bagOfOrbs.Add( OrbType.Water );
             }
-        
+
             for ( var i = 0; i < 4; i++ ) {
                 bagOfOrbs.Add( OrbType.Nuke );
             }
-        
+
             for ( var i = 0; i < 4; i++ ) {
                 bagOfOrbs.Add( OrbType.One );
             }
-        
+
             for ( var i = 0; i < 4; i++ ) {
                 bagOfOrbs.Add( OrbType.Zero );
             }
-        
-        
+
+
             for ( var i = 0; i < 5; i++ ) {
                 bagOfOrbs.Add( OrbType.Save );
             }
-        
-            bagOfOrbs.Add(OrbType.NetworkOne);
-            bagOfOrbs.Add(OrbType.NetworkTwo);
-            bagOfOrbs.Add(OrbType.NetworkThree);
-            bagOfOrbs.Add(OrbType.NetworkFour);
-            bagOfOrbs.Add(OrbType.NetworkFive);
-        
+
+            bagOfOrbs.Add( OrbType.NetworkOne );
+            bagOfOrbs.Add( OrbType.NetworkTwo );
+            bagOfOrbs.Add( OrbType.NetworkThree );
+            bagOfOrbs.Add( OrbType.NetworkFour );
+            bagOfOrbs.Add( OrbType.NetworkFive );
+
             //Shuffle bagOfOrbs
             bagOfOrbs.Shuffle();
-        
+
             //Add orb to start of list
             bagOfOrbs.Insert( 0, OrbType.Encrypt );
-        
-        
+
+            return bagOfOrbs;
         }
 
-        void Start() {
-            InitializeBoard();
-            SetupBoard();
-        }
 
-        void Update() {
-            //Count the total amount of orbs
-            var totalOrbs = _currentCounts.Values.Sum();
-            orbCountText.text = "Orb Count: " + totalOrbs;
-
-            foreach ( var node in _nodes ) {
-                node.Value.DoTick();
+        void ClearBoard() {
+            foreach ( var node in _nodes.Values ) {
+                if ( node.CurrentOrbGameObject != null ) {
+                    RemoveOrb( node.Position );
+                    node.CurrentOrb = OrbType.None;
+                }
             }
+        }
+
+        public void StartNewGame() {
+            ClearBoard();
+            SetupBoard();
         }
 
         void SetupBoard() {
             //Load JSON file "layout.json" from Resources folder
             var json = Resources.Load<TextAsset>( "layout" ).text;
             var layout = JsonUtility.FromJson<LayoutList>( json );
-            //Loop through positions in LayoutList and randomly place up to 8 of each OrbType
-            StartCoroutine( SpawnOrbs( layout ) );
-        
+
+            var bagOfOrbs = GetShuffledBagOfOrbs();
+            StartCoroutine( SpawnOrbs( layout, bagOfOrbs ) );
         }
 
         void PlaceOrb( Vector3Int pos, OrbType type ) {
@@ -221,7 +254,7 @@ namespace CharlieMadeAThing.ProjectHex {
             var cellPos = boardTilemap.CellToWorld( pos );
             var newOrb = Instantiate( prefab, cellPos, Quaternion.identity );
             newOrb.transform.SetParent( boardTilemap.transform );
-            _nodes[pos].ChangeOrbType(type);
+            _nodes[pos].ChangeOrbType( type );
             _currentCounts[type]++;
             _nodes[pos].CurrentOrbGameObject = newOrb;
             _nodes[pos].CurrentOrbSpriteRenderer = newOrb.GetComponentInChildren<SpriteRenderer>();
@@ -233,18 +266,15 @@ namespace CharlieMadeAThing.ProjectHex {
                 Debug.LogWarning( $"Position {pos} is not valid!" );
                 return;
             }
+
             _currentCounts[_nodes[pos].CurrentOrb]--;
             _nodes[pos].CurrentOrb = OrbType.None;
-            //Destroy(_nodes[pos].CurrentOrbGameObject);
+            Destroy(_nodes[pos].CurrentOrbGameObject);
         }
 
-        public Node GetNode( Vector3Int position ) {
-            return _nodes.GetValueOrDefault( position );
-        }
+        public Node GetNode( Vector3Int position ) => _nodes.GetValueOrDefault( position );
 
-        public bool IsOrbOnBoard( OrbType orbType ) {
-            return _currentCounts[orbType] >= 1;
-        }
+        public bool IsOrbOnBoard( OrbType orbType ) => _currentCounts[orbType] >= 1;
 
         public bool IsEncryptTheLastOrbLeft() {
             //Check if all the orb counts are 0 but OrbType.Encrypt
@@ -255,46 +285,35 @@ namespace CharlieMadeAThing.ProjectHex {
             return false;
         }
 
-        bool IsValidPosition( Vector3Int pos ) {
-            return _nodes.ContainsKey( pos ) && _nodes[pos].Tile == validBoardTile;
-        }
-        
+        bool IsValidPosition( Vector3Int pos ) => _nodes.ContainsKey( pos ) && _nodes[pos].Tile == validBoardTile;
+
         bool IsPositionEmpty( Vector3Int pos ) {
             if ( IsValidPosition( pos ) ) {
                 return _nodes[pos].CurrentOrb == OrbType.None;
             }
 
-            Debug.LogWarning( $"Position isn't valid!" );
+            Debug.LogWarning( "Position isn't valid!" );
             return false;
         }
-    
+
         //Coroutine to spawn orbs
-        IEnumerator SpawnOrbs( LayoutList layout ) {
+        IEnumerator SpawnOrbs( LayoutList layout, List<OrbType> bagOfOrbs ) {
             var index = 0;
+
             foreach ( var position in layout.positions ) {
                 //If index has reached the end
-            
+
                 if ( index < bagOfOrbs.Count ) {
                     var orb = bagOfOrbs[index];
                     PlaceOrb( position, orb );
                 }
+
                 index++;
-                yield return new WaitForSeconds( 0.05f );
-            }
-        }
-        
-        //Draw gizmos on orbtype.none
-        private void OnDrawGizmos() {
-            if ( _nodes == null ) return;
-            foreach ( var node in _nodes.Values ) {
-                if ( node.CurrentOrb is OrbType.NonPlayable ) {
-                    Gizmos.color = Color.red;
-                    Gizmos.DrawCube( boardTilemap.CellToWorld( node.Position ), Vector3.one * 0.5f );
-                }
+                yield return new WaitForSeconds( 0.03f );
             }
         }
     }
-    
+
 
     [Flags]
     public enum OrbType {
@@ -316,6 +335,3 @@ namespace CharlieMadeAThing.ProjectHex {
         Encrypt = 32768
     }
 }
-
-
-
