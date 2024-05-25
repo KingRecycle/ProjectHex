@@ -72,7 +72,7 @@ public class LayoutCreator : MonoBehaviour {
         if ( !_isLayoutMode ) return;
         _layoutList.positions = _selectedPositions;
         var json = JsonUtility.ToJson( _layoutList );
-        System.IO.File.WriteAllText( "Assets/Resources/layout.json", json );
+        System.IO.File.WriteAllText( "Assets/Resources/layout2.json", json );
     }
 }
 

@@ -5,12 +5,14 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Random = UnityEngine.Random;
 
 namespace CharlieMadeAThing.ProjectHex {
     public class BoardSetup : MonoBehaviour {
         public Tilemap boardTilemap;
         [SerializeField] Tile validBoardTile;
         [SerializeField] OrbTypeData orbPrefabLookup;
+        [SerializeField] TextAsset[] layouts;
 
         //UI
         [SerializeField] GameObject trackerPanel;
@@ -232,8 +234,10 @@ namespace CharlieMadeAThing.ProjectHex {
         }
 
         void SetupBoard() {
-            //Load JSON file "layout.json" from Resources folder
-            var json = Resources.Load<TextAsset>( "layout" ).text;
+            var range = Random.Range( 0, layouts.Length );
+            Debug.Log($"Layout Selected: {range}");
+            var layoutAsset = layouts[range];
+            var json = layoutAsset.text;
             var layout = JsonUtility.FromJson<LayoutList>( json );
 
             var bagOfOrbs = GetShuffledBagOfOrbs();
